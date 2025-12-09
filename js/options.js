@@ -78,7 +78,15 @@ function render(entries) {
 
       const text = document.createElement("div");
       text.className = "text";
-      text.innerHTML = `<span class="site">${entry.site}</span> → ${entry.query}`;
+      const siteEl = document.createElement("span");
+      siteEl.className = "site";
+      siteEl.textContent = entry.site;
+      const arrow = document.createTextNode(" → ");
+      const queryEl = document.createElement("span");
+      queryEl.textContent = entry.query;
+      text.appendChild(siteEl);
+      text.appendChild(arrow);
+      text.appendChild(queryEl);
       row.appendChild(text);
 
       const del = document.createElement("button");
