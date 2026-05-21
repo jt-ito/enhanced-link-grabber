@@ -1,77 +1,143 @@
-# Enhanced Link Grabber for Firefox
+# Link Grabber — for Firefox & Chrome
 
-Extract, group, and copy every useful link on a page with filtering, domain toggles, and live highlighting in the tab you are inspecting.
+> Extract, filter, and copy every link on any page in seconds. Works on both Firefox and Chrome.
 
-## What it does
-- Scans the active tab for anchors plus common media/embed sources (`img`, `video`, `audio`, `iframe`, `script`, `link`, `source`, `track`) and normalizes them to absolute URLs.
-- Groups results by domain; click a domain header to focus on just that domain, click again to reset.
-- Filters in real time: plain text contains, multi-term (`foo+bar`), or regex (`/pattern/`).
-- Copies a single link by clicking the row or copies all filtered links with one button.
-- Highlights the hovered link directly in the page so you can see what you are about to copy.
-- Dark mode toggle built into the popup.
+Ever landed on a page packed with download links, media files, or references and thought *"I just want all of these URLs, right now"*? Link Grabber does exactly that. One click opens a popup with every link on the page, grouped by domain, ready to filter and copy — no fuss, no tracking, no cloud.
 
-## Installation (temporary load for development)
-1. Open Firefox and go to `about:debugging#/runtime/this-firefox`.
-2. Click **Load Temporary Add-on**.
-3. Choose `manifest.json` from this folder. The extension will appear in the toolbar; reopen the popup after code changes.
+---
 
-## Usage
-- Click the toolbar button to open the popup.
-- Use the filter box to narrow results. Examples:
-  - `mp4` → plain text contains
-  - `1080p+60fps` → must contain both terms
-  - `/https?:\\/\\/example\\.com/` → regex (case-insensitive)
-- Hover a link row to highlight it in the page; click the row to copy that URL.
-- Click **Copy All** to copy all current (and filtered) results. Domain focus is respected when active.
-- Click a domain header to toggle domain-only view.
-- Use **Toggle Dark** to switch themes.
+## Features at a glance
 
-## Settings and default searches
-- Open **Settings** from the popup or via the extension’s Options page to store per-site default searches.
-- Add a site (e.g. `example.com` or `news.example.com`) and the filter you always use (`mp4+1080p`, `/regex/`, etc.).
-- When you open the popup on a matching site and the filter is empty, the default search is applied automatically. Everything stays on-device in `browser.storage.local`.
-- Theme preference (light/dark) is stored locally and shared between the popup and Settings page, with dark as the default.
+| Feature | Details |
+|---|---|
+| **Deep link scanning** | Captures anchors plus media/embed sources — `img`, `video`, `audio`, `iframe`, `script`, `link`, `source`, `track` |
+| **Smart filtering** | Plain text, multi-term (`1080p+mp4`), or full regex (`/pattern/i`) |
+| **Domain grouping** | Results grouped by hostname; click a domain to isolate it, click again to reset |
+| **One-click copy** | Click any row to copy that URL, or hit **Copy All** to grab everything filtered |
+| **Live highlighting** | Hover a link in the popup and it lights up orange on the actual page |
+| **Per-site defaults** | Save a default search per site — the filter pre-fills automatically when you land there |
+| **Theme sync** | Dark/light preference stored locally and shared across popup and settings page |
 
-## How it works
-- `js/contentscript.js` collects anchors and common media/embed `src`-like attributes, normalizes them to absolute URLs, and responds to messages for:
-  - `getLinks` → returns all collected links
-  - `highlight` / `clearHighlight` → draws or removes an outline on the matching anchor
-- `js/popup.js` renders and filters the list, handles copy actions, and sends highlight requests.
-- `background.js` keeps a simple log on install and stores collected links when notified (currently unused UI-side but available for future features).
+---
+
+## Installation
+
+### Firefox
+1. Download the latest `.xpi` from the [Releases page](https://github.com/jt-ito/enhanced-link-grabber-for-chrome-and-firefox/releases).
+2. Open Firefox → `about:addons` → click the gear icon → **Install Add-on From File** → pick the `.xpi`.
+
+Or load temporarily for development:
+1. Go to `about:debugging#/runtime/this-firefox`.
+2. Click **Load Temporary Add-on** and select `manifest.json` from the Firefox folder.
+
+### Chrome
+1. Download the latest `link_grabber_chrome_vX.X.zip` from the [Releases page](https://github.com/jt-ito/enhanced-link-grabber-for-chrome-and-firefox/releases) and unzip it.
+2. Go to `chrome://extensions/`, enable **Developer mode**, click **Load unpacked**, and select the unzipped folder.
+
+---
+
+## Using the extension
+
+Click the toolbar icon to open the popup. From there:
+
+**Filtering**
+- Type anything to do a plain contains match — e.g. `mp4` shows only links with "mp4" in the URL.
+- Use `+` to require multiple terms — e.g. `1080p+60fps` shows links containing both.
+- Wrap in `/slashes/` for a regex — e.g. `/\.mkv$/i` matches `.mkv` links case-insensitively.
+- Hit **×** to clear the filter instantly.
+
+**Domain focus**
+- Click any domain header to show only links from that domain.
+- Click it again to go back to all results.
+
+**Copying**
+- Click any link row to copy that single URL to your clipboard.
+- Click **Copy All** to copy every currently visible (filtered + domain-focused) link, one per line.
+
+**Theme**
+- Click **Toggle Dark** to switch between dark and light mode. Your preference is saved automatically.
+
+**Settings**
+- Click **Settings** to open the settings page.
+
+---
+
+## Per-site default searches
+
+If you always look for the same thing on a particular site — say, `mp4` on a video archive, or `/episode/` on a media site — you can save that as a default:
+
+1. Open **Settings** from the popup.
+2. Enter the site (e.g. `example.com`) and your default filter (e.g. `mp4+1080p` or `/\.mkv$/`).
+3. Click **Save / Update**.
+
+Next time you open the popup on that site with an empty filter, it auto-fills for you. You can save as many site/filter pairs as you like and delete them any time. Everything is stored locally — nothing leaves your device.
+
+---
 
 ## Privacy & data collection
-- Declared in `manifest.json` under `browser_specific_settings.gecko.data_collection_permissions` as `required: ["none"]` — the extension does **not** collect or transmit data off the device.
-- Permissions requested: `activeTab`, `tabs`, `storage`, and `clipboardWrite` to read the active page, remember state, and copy links.
+
+This extension collects **nothing**. No analytics, no telemetry, no external requests of any kind.
+
+- Declared in `manifest.json` under `browser_specific_settings.gecko.data_collection_permissions` as `required: ["none"]`.
+- All stored data (default searches, theme preference) lives in `browser.storage.local` / `chrome.storage.local` on your own device.
+- Permissions requested and why:
+
+| Permission | Why |
+|---|---|
+| `activeTab` | Read the current page to collect links |
+| `tabs` | Query the active tab URL for per-site defaults |
+| `storage` | Save your settings and theme preference locally |
+| `clipboardWrite` | Copy links to your clipboard |
+
+---
+
+## How it works (for the curious)
+
+- **`js/contentscript.js`** — injected into every page. Listens for three messages: `getLinks` (returns all collected URLs), `highlight` (outlines a specific anchor in orange), and `clearHighlight` (removes the outline).
+- **`js/popup.js`** — drives the popup UI. Loads your theme and per-site default on open, renders grouped/filtered links, handles copy actions, and forwards hover events to the content script.
+- **`js/options.js`** — powers the settings page. Reads and writes per-site default search entries and the active theme to local storage.
+- **`background.js`** — minimal listener; handles install logging. Firefox uses a persistent background script; Chrome uses a MV3 service worker.
+
+---
 
 ## Project layout
+
 ```
-.
+Firefox extension (Manifest V2)
 ├─ manifest.json
 ├─ background.js
 ├─ popup.html
+├─ options.html
 ├─ js/
 │  ├─ contentscript.js
-│  └─ popup.js
-├─ icon_48.png
-├─ icon_96.png
-├─ icon_128.png
-└─ README.md
+│  ├─ popup.js
+│  └─ options.js
+└─ icon_48/96/128.png
+
+link_grabber_chrome_v1_3_3/   ← Chrome extension (Manifest V3)
+├─ manifest.json
+├─ background.js               ← service worker
+├─ popup.html
+├─ options.html
+├─ js/
+│  ├─ contentscript.js
+│  ├─ popup.js
+│  └─ options.js
+└─ icon_48/96/128.png
 ```
+
+---
 
 ## Development tips
-- Quick reload: after editing files, reopen the popup; for content-script changes, refresh the target tab.
-- Optional helper: install `web-ext` globally (`npm install -g web-ext`) and run `web-ext run` from this folder for a dedicated test profile with auto-reload.
-- Signing/building for AMO: `web-ext build` produces a ZIP in `web-ext-artifacts/`. Submit that ZIP to AMO.
 
-## Suggested git setup
-If starting a fresh repo here:
-```
-git init
-git add .
-git commit -m "chore: initial import"
-git remote add origin git@github.com:<you>/enhanced-link-grabber-for-firefox.git
-git push -u origin main
-```
+- **Quick popup reload** — reopen the popup after editing JS/HTML; no full extension reload needed.
+- **Content script changes** — refresh the target tab after saving `contentscript.js`.
+- **Firefox auto-reload** — install `web-ext` globally (`npm install -g web-ext`) and run `web-ext run` from the Firefox folder for a dedicated profile with live reload.
+- **Build for AMO** — `web-ext build` produces a ready-to-submit ZIP in `web-ext-artifacts/`.
+- **Chrome packaging** — zip the contents of `link_grabber_chrome_v1_3_3/` and upload to the Chrome Web Store developer dashboard.
+
+---
 
 ## License
+
 MIT — see `LICENSE`.
