@@ -23,7 +23,7 @@ Ever landed on a page packed with download links, media files, or references and
 ## Installation
 
 ### Firefox
-1. Download the latest `.xpi` from the [Releases page](https://github.com/jt-ito/enhanced-link-grabber-for-chrome-and-firefox/releases).
+1. Download the latest `.xpi` from the [Releases page](https://github.com/jt-ito/enhanced-link-grabber/releases).
 2. Open Firefox → `about:addons` → click the gear icon → **Install Add-on From File** → pick the `.xpi`.
 
 Or load temporarily for development:
@@ -31,7 +31,7 @@ Or load temporarily for development:
 2. Click **Load Temporary Add-on** and select `manifest.json` from the Firefox folder.
 
 ### Chrome
-1. Download the latest `link_grabber_chrome_vX.X.zip` from the [Releases page](https://github.com/jt-ito/enhanced-link-grabber-for-chrome-and-firefox/releases) and unzip it.
+1. Download the latest `link_grabber_chrome_vX.X.zip` from the [Releases page](https://github.com/jt-ito/enhanced-link-grabber/releases) and unzip it.
 2. Go to `chrome://extensions/`, enable **Developer mode**, click **Load unpacked**, and select the unzipped folder.
 
 ---
